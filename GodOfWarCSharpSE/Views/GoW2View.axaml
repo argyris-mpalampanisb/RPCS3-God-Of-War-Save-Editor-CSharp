@@ -5,7 +5,8 @@
         x:DataType="vm:GoW2ViewModel"
         Title="CSharp GoW2 Save Editor"
         Width="620" Height="550"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        FontSize="12">
 
   <DockPanel Margin="8">
 
@@ -31,6 +32,10 @@
       <Button Content="Slot 10" Command="{Binding SelectSlotCommand}" CommandParameter="9" Margin="0,0,4,4" />
     </WrapPanel>
 
+    <!-- Status line -->
+    <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusText}" Margin="0,6,0,0"
+               TextWrapping="Wrap" Opacity="0.8" />
+
     <!-- Master -->
     <Border DockPanel.Dock="Bottom" Padding="12" BorderBrush="Gray" BorderThickness="1"
             IsVisible="{Binding IsMaster}">
@@ -50,7 +55,7 @@
       </StackPanel>
     </Border>
 
-    <TabControl IsVisible="{Binding IsLoaded, Converter={StaticResource InverseBool}}">
+    <TabControl IsVisible="{Binding IsSlotLoaded}">
 
       <!-- Character -->
       <TabItem IsVisible="{Binding IsMaster, Converter={StaticResource InverseBool}}">

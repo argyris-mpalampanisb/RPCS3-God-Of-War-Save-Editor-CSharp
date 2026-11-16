@@ -5,7 +5,8 @@
         x:DataType="vm:GoW1ViewModel"
         Title="CSharp RPCS3 GoW1 Save Editor"
         Width="600" Height="500"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        FontSize="12">
 
   <DockPanel Margin="8">
 
@@ -28,6 +29,10 @@
       <Button Content="Slot 4" Command="{Binding SelectSlotCommand}" CommandParameter="3" />
     </StackPanel>
 
+    <!-- Status line -->
+    <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusText}" Margin="0,6,0,0"
+               TextWrapping="Wrap" Opacity="0.8" />
+
     <!-- Master group -->
     <Border DockPanel.Dock="Bottom" Padding="12" BorderBrush="Gray" BorderThickness="1"
             IsVisible="{Binding IsMaster}">
@@ -41,7 +46,7 @@
     </Border>
 
     <!-- Tab control -->
-    <TabControl IsVisible="{Binding IsLoaded, Converter={StaticResource InverseBool}}">
+    <TabControl IsVisible="{Binding IsSlotLoaded}">
 
       <!-- Character Tab -->
       <TabItem IsVisible="{Binding IsMaster, Converter={StaticResource InverseBool}}">

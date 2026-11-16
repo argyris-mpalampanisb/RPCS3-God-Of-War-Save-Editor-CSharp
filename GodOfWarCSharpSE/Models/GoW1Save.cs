@@ -87,30 +87,79 @@ public class GoW1Save
     public string Checksum => SaveFile.ComputeChecksum(_data[..^4]).ToString("X8");
 
     // --- Load ---
+    /// <summary>Full path of the file currently in _data.</summary>
+    public string DataPath { get; private set; } = "";
+
+    /// <summary>Human-readable reason the last Load failed.</summary>
+    public string LastError { get; private set; } = "";
+
     public bool Load(string folder, int slot = -1)
     {
-        SaveFolder = folder;
-        SlotNum = slot;
-        Modified = false;
-
+        LastError = "";
         string masterPath = Path.Combine(folder, "MASTER.BIN");
-        if (!File.Exists(masterPath)) return false;
-        _master = File.ReadAllBytes(masterPath);
+        if (!File.Exists(masterPath))
+        {
+            LastError = $"MASTER.BIN not found in {folder}";
+            return false;
+        }
 
         if (slot == -1)
         {
+            _master = File.ReadAllBytes(masterPath);
+            SaveFolder = folder;
+            SlotNum = -1;
             Filename = "MASTER.BIN";
+            DataPath = masterPath;
             _data = _master;
+            Modified = false;
             return true;
         }
-        else
+
+        string fileName = $"DATA0{slot}.BIN";
+        string? dataPath = FindSlotFile(folder, fileName);
+        if (dataPath is null)
         {
-            Filename = $"DATA0{slot}.BIN";
-            string dataPath = Path.Combine(folder, Filename);
-            if (!File.Exists(dataPath)) return false;
-            _data = File.ReadAllBytes(dataPath);
-            return true;
+            LastError = $"Slot {slot + 1} is empty: {fileName} was not found next to MASTER.BIN " +
+                        "or in the neighbouring save folders.";
+            return false;   // keep the previously loaded data intact
         }
+
+        _master = File.ReadAllBytes(masterPath);
+        _data = File.ReadAllBytes(dataPath);
+        SaveFolder = folder;
+        SlotNum = slot;
+        Filename = fileName;
+        DataPath = dataPath;
+        Modified = false;
+        return true;
+    }
+
+    /// <summary>
+    /// Looks for a slot file next to MASTER.BIN first, then in sibling folders of
+    /// the same game (RPCS3 can store each PS3 save slot in its own savedata folder).
+    /// </summary>
+    private static string? FindSlotFile(string folder, string fileName)
+    {
+        string direct = Path.Combine(folder, fileName);
+        if (File.Exists(direct)) return direct;
+
+        var dir = new DirectoryInfo(folder);
+        var parent = dir.Parent;
+        if (parent is null) return null;
+
+        // Sibling folders that share the title-ID prefix (e.g. BCUS98229...)
+        string prefix = dir.Name.Length >= 9 ? dir.Name[..9] : dir.Name;
+        try
+        {
+            foreach (var sibling in parent.EnumerateDirectories(prefix + "*"))
+            {
+                string candidate = Path.Combine(sibling.FullName, fileName);
+                if (File.Exists(candidate)) return candidate;
+            }
+        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+        return null;
     }
 
     // --- Save ---
@@ -127,7 +176,7 @@ public class GoW1Save
         uint csum = SaveFile.ComputeChecksum(_data[..^4]);
         SaveFile.WriteUInt32(_data, _data.Length - 4, csum, true);
 
-        File.WriteAllBytes(Path.Combine(SaveFolder, Filename), _data);
+        File.WriteAllBytes(DataPath, _data);
 
         // Update MASTER.BIN slot entry
         int slotOffset = 4 + 16 * SlotNum;
@@ -152,7 +201,7 @@ public class GoW1Save
     public bool NewGame(byte[] blankSave)
     {
         if (IsMaster) return false;
-        File.WriteAllBytes(Path.Combine(SaveFolder, Filename), blankSave);
+        File.WriteAllBytes(DataPath, blankSave);
 
         // Reset MASTER.BIN slot entry
         int slotOffset = 4 + 16 * SlotNum;

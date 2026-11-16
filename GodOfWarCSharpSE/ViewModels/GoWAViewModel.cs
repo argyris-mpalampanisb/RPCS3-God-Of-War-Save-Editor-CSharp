@@ -1,14 +1,18 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using Avalonia.Platform.Storage;
 using GodOfWarCSharpSE.Models;
-using ReactiveUI;
-using System.Reactive;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace GodOfWarCSharpSE.ViewModels;
 
-public class GoWAViewModel : ReactiveObject
+// Ported from ReactiveUI to CommunityToolkit.Mvvm (same as the GoW1-3 editors).
+// Avalonia.ReactiveUI 11.x is not compatible with Avalonia 12 and crashed on open.
+public class GoWAViewModel : ObservableObject
 {
     private readonly GoWASave _save = new();
 
@@ -134,137 +138,145 @@ public class GoWAViewModel : ReactiveObject
     public ObservableCollection<InventoryItem> InventoryItems { get; }
 
     // --- Commands ---
-    public ReactiveCommand<Unit, Unit> BrowseCommand { get; }
-    public ReactiveCommand<Unit, Unit> OpenCommand { get; }
-    public ReactiveCommand<Unit, Unit> SaveCommand { get; }
-    public ReactiveCommand<int, Unit> ChannelCommand { get; }
+    public IRelayCommand BrowseCommand { get; }
+    public IRelayCommand OpenCommand { get; }
+    public IRelayCommand SaveCommand { get; }
+    public IRelayCommand<object?> ChannelCommand { get; }
+
+    private string _statusText = "Browse to the folder containing DAT-1, then click Open.";
+    public string StatusText
+    {
+        get => _statusText;
+        private set => SetProperty(ref _statusText, value);
+    }
 
     // --- Observable properties ---
     public string Folder
     {
         get => _folder;
-        set => this.RaiseAndSetIfChanged(ref _folder, value);
+        set => SetProperty(ref _folder, value);
     }
 
     public bool IsLoaded
     {
         get => _isLoaded;
-        private set => this.RaiseAndSetIfChanged(ref _isLoaded, value);
+        private set => SetProperty(ref _isLoaded, value);
     }
 
     public bool IsModified
     {
         get => _isModified;
-        private set => this.RaiseAndSetIfChanged(ref _isModified, value);
+        private set => SetProperty(ref _isModified, value);
     }
 
     public int SelectedChannel
     {
         get => _selectedChannel;
-        private set => this.RaiseAndSetIfChanged(ref _selectedChannel, value);
+        private set => SetProperty(ref _selectedChannel, value);
     }
 
     public bool ShowBrowse
     {
         get => _showBrowse;
-        private set => this.RaiseAndSetIfChanged(ref _showBrowse, value);
+        private set => SetProperty(ref _showBrowse, value);
     }
 
     public bool ShowOpen
     {
         get => _showOpen;
-        private set => this.RaiseAndSetIfChanged(ref _showOpen, value);
+        private set => SetProperty(ref _showOpen, value);
     }
 
     public bool ShowData
     {
         get => _showData;
-        private set => this.RaiseAndSetIfChanged(ref _showData, value);
+        private set => SetProperty(ref _showData, value);
     }
 
     // Character
-    public string Health       { get => _health;       set { this.RaiseAndSetIfChanged(ref _health, value); IsModified = true; } }
-    public string HealthRegen  { get => _healthRegen;  set { this.RaiseAndSetIfChanged(ref _healthRegen, value); IsModified = true; } }
-    public string Magic         { get => _magic;        set { this.RaiseAndSetIfChanged(ref _magic, value); IsModified = true; } }
-    public string MagicRegen   { get => _magicRegen;   set { this.RaiseAndSetIfChanged(ref _magicRegen, value); IsModified = true; } }
-    public string Rage          { get => _rage;         set { this.RaiseAndSetIfChanged(ref _rage, value); IsModified = true; } }
-    public string RageRegen    { get => _rageRegen;    set { this.RaiseAndSetIfChanged(ref _rageRegen, value); IsModified = true; } }
-    public string RedOrbs      { get => _redOrbs;      set { this.RaiseAndSetIfChanged(ref _redOrbs, value); IsModified = true; } }
-    public string XPos         { get => _xPos;         set { this.RaiseAndSetIfChanged(ref _xPos, value); IsModified = true; } }
-    public string YPos         { get => _yPos;         set { this.RaiseAndSetIfChanged(ref _yPos, value); IsModified = true; } }
-    public string ZPos         { get => _zPos;         set { this.RaiseAndSetIfChanged(ref _zPos, value); IsModified = true; } }
-    public bool Swimming       { get => _swimming;     set { this.RaiseAndSetIfChanged(ref _swimming, value); IsModified = true; } }
-    public bool Frozen         { get => _frozen;       set { this.RaiseAndSetIfChanged(ref _frozen, value); IsModified = true; } }
-    public string GorgonEyes   { get => _gorgonEyes;   set { this.RaiseAndSetIfChanged(ref _gorgonEyes, value); IsModified = true; } }
-    public string PhoenixFeathers { get => _phoenixFeathers; set { this.RaiseAndSetIfChanged(ref _phoenixFeathers, value); IsModified = true; } }
-    public string SubwepAmmo   { get => _subwepAmmo;   set { this.RaiseAndSetIfChanged(ref _subwepAmmo, value); IsModified = true; } }
-    public int Difficulty      { get => _difficulty;   set { this.RaiseAndSetIfChanged(ref _difficulty, value); IsModified = true; } }
-    public bool NewGamePlus    { get => _newGamePlus;  set { this.RaiseAndSetIfChanged(ref _newGamePlus, value); IsModified = true; } }
+    public string Health       { get => _health;       set { SetProperty(ref _health, value); IsModified = true; } }
+    public string HealthRegen  { get => _healthRegen;  set { SetProperty(ref _healthRegen, value); IsModified = true; } }
+    public string Magic         { get => _magic;        set { SetProperty(ref _magic, value); IsModified = true; } }
+    public string MagicRegen   { get => _magicRegen;   set { SetProperty(ref _magicRegen, value); IsModified = true; } }
+    public string Rage          { get => _rage;         set { SetProperty(ref _rage, value); IsModified = true; } }
+    public string RageRegen    { get => _rageRegen;    set { SetProperty(ref _rageRegen, value); IsModified = true; } }
+    public string RedOrbs      { get => _redOrbs;      set { SetProperty(ref _redOrbs, value); IsModified = true; } }
+    public string XPos         { get => _xPos;         set { SetProperty(ref _xPos, value); IsModified = true; } }
+    public string YPos         { get => _yPos;         set { SetProperty(ref _yPos, value); IsModified = true; } }
+    public string ZPos         { get => _zPos;         set { SetProperty(ref _zPos, value); IsModified = true; } }
+    public bool Swimming       { get => _swimming;     set { SetProperty(ref _swimming, value); IsModified = true; } }
+    public bool Frozen         { get => _frozen;       set { SetProperty(ref _frozen, value); IsModified = true; } }
+    public string GorgonEyes   { get => _gorgonEyes;   set { SetProperty(ref _gorgonEyes, value); IsModified = true; } }
+    public string PhoenixFeathers { get => _phoenixFeathers; set { SetProperty(ref _phoenixFeathers, value); IsModified = true; } }
+    public string SubwepAmmo   { get => _subwepAmmo;   set { SetProperty(ref _subwepAmmo, value); IsModified = true; } }
+    public int Difficulty      { get => _difficulty;   set { SetProperty(ref _difficulty, value); IsModified = true; } }
+    public bool NewGamePlus    { get => _newGamePlus;  set { SetProperty(ref _newGamePlus, value); IsModified = true; } }
 
     // Weapons
-    public string BladesLvl   { get => _bladesLvl;   set { this.RaiseAndSetIfChanged(ref _bladesLvl, value); IsModified = true; } }
-    public string ElecLvl     { get => _elecLvl;     set { this.RaiseAndSetIfChanged(ref _elecLvl, value); IsModified = true; } }
-    public string FireLvl     { get => _fireLvl;     set { this.RaiseAndSetIfChanged(ref _fireLvl, value); IsModified = true; } }
-    public string IceLvl      { get => _iceLvl;      set { this.RaiseAndSetIfChanged(ref _iceLvl, value); IsModified = true; } }
-    public string SoulLvl     { get => _soulLvl;     set { this.RaiseAndSetIfChanged(ref _soulLvl, value); IsModified = true; } }
-    public string AmuletLvl   { get => _amuletLvl;   set { this.RaiseAndSetIfChanged(ref _amuletLvl, value); IsModified = true; } }
-    public string OathLvl     { get => _oathLvl;     set { this.RaiseAndSetIfChanged(ref _oathLvl, value); IsModified = true; } }
-    public string EyesLvl     { get => _eyesLvl;     set { this.RaiseAndSetIfChanged(ref _eyesLvl, value); IsModified = true; } }
+    public string BladesLvl   { get => _bladesLvl;   set { SetProperty(ref _bladesLvl, value); IsModified = true; } }
+    public string ElecLvl     { get => _elecLvl;     set { SetProperty(ref _elecLvl, value); IsModified = true; } }
+    public string FireLvl     { get => _fireLvl;     set { SetProperty(ref _fireLvl, value); IsModified = true; } }
+    public string IceLvl      { get => _iceLvl;      set { SetProperty(ref _iceLvl, value); IsModified = true; } }
+    public string SoulLvl     { get => _soulLvl;     set { SetProperty(ref _soulLvl, value); IsModified = true; } }
+    public string AmuletLvl   { get => _amuletLvl;   set { SetProperty(ref _amuletLvl, value); IsModified = true; } }
+    public string OathLvl     { get => _oathLvl;     set { SetProperty(ref _oathLvl, value); IsModified = true; } }
+    public string EyesLvl     { get => _eyesLvl;     set { SetProperty(ref _eyesLvl, value); IsModified = true; } }
 
-    public string BladesOrbs  { get => _bladesOrbs;  set { this.RaiseAndSetIfChanged(ref _bladesOrbs, value); IsModified = true; } }
-    public string ElecOrbs    { get => _elecOrbs;    set { this.RaiseAndSetIfChanged(ref _elecOrbs, value); IsModified = true; } }
-    public string FireOrbs    { get => _fireOrbs;    set { this.RaiseAndSetIfChanged(ref _fireOrbs, value); IsModified = true; } }
-    public string IceOrbs     { get => _iceOrbs;     set { this.RaiseAndSetIfChanged(ref _iceOrbs, value); IsModified = true; } }
-    public string SoulOrbs    { get => _soulOrbs;    set { this.RaiseAndSetIfChanged(ref _soulOrbs, value); IsModified = true; } }
-    public string AmuletOrbs  { get => _amuletOrbs;  set { this.RaiseAndSetIfChanged(ref _amuletOrbs, value); IsModified = true; } }
-    public string OathOrbs    { get => _oathOrbs;    set { this.RaiseAndSetIfChanged(ref _oathOrbs, value); IsModified = true; } }
-    public string EyesOrbs    { get => _eyesOrbs;    set { this.RaiseAndSetIfChanged(ref _eyesOrbs, value); IsModified = true; } }
+    public string BladesOrbs  { get => _bladesOrbs;  set { SetProperty(ref _bladesOrbs, value); IsModified = true; } }
+    public string ElecOrbs    { get => _elecOrbs;    set { SetProperty(ref _elecOrbs, value); IsModified = true; } }
+    public string FireOrbs    { get => _fireOrbs;    set { SetProperty(ref _fireOrbs, value); IsModified = true; } }
+    public string IceOrbs     { get => _iceOrbs;     set { SetProperty(ref _iceOrbs, value); IsModified = true; } }
+    public string SoulOrbs    { get => _soulOrbs;    set { SetProperty(ref _soulOrbs, value); IsModified = true; } }
+    public string AmuletOrbs  { get => _amuletOrbs;  set { SetProperty(ref _amuletOrbs, value); IsModified = true; } }
+    public string OathOrbs    { get => _oathOrbs;    set { SetProperty(ref _oathOrbs, value); IsModified = true; } }
+    public string EyesOrbs    { get => _eyesOrbs;    set { SetProperty(ref _eyesOrbs, value); IsModified = true; } }
 
-    public bool BladesUnl { get => _bladesUnl; set { this.RaiseAndSetIfChanged(ref _bladesUnl, value); IsModified = true; SyncWeaponToInv(0, value); } }
-    public bool ElecUnl   { get => _elecUnl;   set { this.RaiseAndSetIfChanged(ref _elecUnl, value); IsModified = true; SyncWeaponToInv(1, value); } }
-    public bool FireUnl   { get => _fireUnl;   set { this.RaiseAndSetIfChanged(ref _fireUnl, value); IsModified = true; SyncWeaponToInv(2, value); } }
-    public bool IceUnl    { get => _iceUnl;    set { this.RaiseAndSetIfChanged(ref _iceUnl, value); IsModified = true; SyncWeaponToInv(3, value); } }
-    public bool SoulUnl   { get => _soulUnl;   set { this.RaiseAndSetIfChanged(ref _soulUnl, value); IsModified = true; SyncWeaponToInv(4, value); } }
-    public bool AmuletUnl { get => _amuletUnl; set { this.RaiseAndSetIfChanged(ref _amuletUnl, value); IsModified = true; } }
-    public bool OathUnl   { get => _oathUnl;   set { this.RaiseAndSetIfChanged(ref _oathUnl, value); IsModified = true; } }
-    public bool EyesUnl   { get => _eyesUnl;   set { this.RaiseAndSetIfChanged(ref _eyesUnl, value); IsModified = true; } }
+    public bool BladesUnl { get => _bladesUnl; set { if (SetProperty(ref _bladesUnl, value)) OnWeaponUnlockChanged(0, value); } }
+    public bool ElecUnl   { get => _elecUnl;   set { if (SetProperty(ref _elecUnl, value))   OnWeaponUnlockChanged(1, value); } }
+    public bool FireUnl   { get => _fireUnl;   set { if (SetProperty(ref _fireUnl, value))   OnWeaponUnlockChanged(2, value); } }
+    public bool IceUnl    { get => _iceUnl;    set { if (SetProperty(ref _iceUnl, value))    OnWeaponUnlockChanged(3, value); } }
+    public bool SoulUnl   { get => _soulUnl;   set { if (SetProperty(ref _soulUnl, value))   OnWeaponUnlockChanged(4, value); } }
+    public bool AmuletUnl { get => _amuletUnl; set { if (SetProperty(ref _amuletUnl, value)) OnWeaponUnlockChanged(5, value); } }
+    public bool OathUnl   { get => _oathUnl;   set { if (SetProperty(ref _oathUnl, value))   OnWeaponUnlockChanged(6, value); } }
+    public bool EyesUnl   { get => _eyesUnl;   set { if (SetProperty(ref _eyesUnl, value))   OnWeaponUnlockChanged(7, value); } }
 
-    public bool BladesSel { get => _bladesSel; set { this.RaiseAndSetIfChanged(ref _bladesSel, value); IsModified = true; if (value) { ElecSel = false; FireSel = false; IceSel = false; SoulSel = false; } } }
-    public bool ElecSel   { get => _elecSel;   set { this.RaiseAndSetIfChanged(ref _elecSel, value); IsModified = true; if (value) { BladesSel = false; FireSel = false; IceSel = false; SoulSel = false; } } }
-    public bool FireSel   { get => _fireSel;   set { this.RaiseAndSetIfChanged(ref _fireSel, value); IsModified = true; if (value) { BladesSel = false; ElecSel = false; IceSel = false; SoulSel = false; } } }
-    public bool IceSel    { get => _iceSel;    set { this.RaiseAndSetIfChanged(ref _iceSel, value); IsModified = true; if (value) { BladesSel = false; ElecSel = false; FireSel = false; SoulSel = false; } } }
-    public bool SoulSel   { get => _soulSel;   set { this.RaiseAndSetIfChanged(ref _soulSel, value); IsModified = true; if (value) { BladesSel = false; ElecSel = false; FireSel = false; IceSel = false; } } }
+    // VB chkEleSel_Click: only the four elements are mutually exclusive; Blades is independent.
+    public bool BladesSel { get => _bladesSel; set { SetProperty(ref _bladesSel, value); IsModified = true; } }
+    public bool ElecSel   { get => _elecSel;   set { SetProperty(ref _elecSel, value); IsModified = true; if (value) { FireSel = false; IceSel = false; SoulSel = false; } } }
+    public bool FireSel   { get => _fireSel;   set { SetProperty(ref _fireSel, value); IsModified = true; if (value) { ElecSel = false; IceSel = false; SoulSel = false; } } }
+    public bool IceSel    { get => _iceSel;    set { SetProperty(ref _iceSel, value); IsModified = true; if (value) { ElecSel = false; FireSel = false; SoulSel = false; } } }
+    public bool SoulSel   { get => _soulSel;   set { SetProperty(ref _soulSel, value); IsModified = true; if (value) { ElecSel = false; FireSel = false; IceSel = false; } } }
 
     // Sub-weapon
     public int SubWeaponIndex
     {
         get => _subWeaponIndex;
-        set { this.RaiseAndSetIfChanged(ref _subWeaponIndex, value); IsModified = true; SyncSubWeaponToInv(); }
+        set { SetProperty(ref _subWeaponIndex, value); IsModified = true; SyncSubWeaponToInv(); }
     }
 
     public bool SubwepGlitch
     {
         get => _subwepGlitch;
-        set { this.RaiseAndSetIfChanged(ref _subwepGlitch, value); IsModified = true; SyncSubwepGlitchToInv(); }
+        set { SetProperty(ref _subwepGlitch, value); IsModified = true; SyncSubwepGlitchToInv(); }
     }
 
     public bool SubwepGlitchEnabled
     {
         get => _subwepGlitchEnabled;
-        private set => this.RaiseAndSetIfChanged(ref _subwepGlitchEnabled, value);
+        private set => SetProperty(ref _subwepGlitchEnabled, value);
     }
 
     // Costume
     public int TorsoIndex
     {
         get => _torsoIndex;
-        set { this.RaiseAndSetIfChanged(ref _torsoIndex, value); IsModified = true; SyncCostumeToInv(); }
+        set { SetProperty(ref _torsoIndex, value); IsModified = true; SyncCostumeToInv(); }
     }
 
     public int PantsIndex
     {
         get => _pantsIndex;
-        set { this.RaiseAndSetIfChanged(ref _pantsIndex, value); IsModified = true; SyncCostumeToInv(); }
+        set { SetProperty(ref _pantsIndex, value); IsModified = true; SyncCostumeToInv(); }
     }
 
     // --- Constructor ---
@@ -273,10 +285,14 @@ public class GoWAViewModel : ReactiveObject
         InventoryItems = new ObservableCollection<InventoryItem>(
             InventoryNames.Select(n => new InventoryItem(n)));
 
-        BrowseCommand  = ReactiveCommand.Create(Browse);
-        OpenCommand    = ReactiveCommand.Create(Open);
-        SaveCommand    = ReactiveCommand.Create(Save);
-        ChannelCommand = ReactiveCommand.Create<int>(SelectChannel);
+        BrowseCommand  = new RelayCommand(Browse);
+        OpenCommand    = new RelayCommand(Open);
+        SaveCommand    = new RelayCommand(Save);
+        ChannelCommand = new RelayCommand<object?>(p =>
+        {
+            // CommandParameter arrives from XAML as a string
+            if (int.TryParse(p?.ToString(), out int ch)) SelectChannel(ch);
+        });
     }
 
     // --- Channel selection ---
@@ -287,9 +303,11 @@ public class GoWAViewModel : ReactiveObject
             // In production, show a confirmation dialog here
             // For now, proceed
         }
-        SelectedChannel = channel;
+        _save.FolderPath = Folder;
         _save.Channel = channel;
         string? err = _save.Load();
+        if (err == null) SelectedChannel = channel;
+        else _save.Channel = SelectedChannel;   // stay on the slot that is actually loaded
         if (err == null)
         {
             PopulateFromSave();
@@ -297,22 +315,36 @@ public class GoWAViewModel : ReactiveObject
             ShowData = true;
             ShowBrowse = false;
             ShowOpen = false;
+            IsModified = false;
+            StatusText = $"Loaded slot {channel}.";
+        }
+        else
+        {
+            StatusText = err;
         }
     }
 
     // --- Populate UI from save ---
     private void PopulateFromSave()
     {
-        Health      = _save.Health.ToString("F4");
-        HealthRegen = _save.HealthRegen.ToString("F4");
-        Magic       = _save.Magic.ToString("F4");
-        MagicRegen  = _save.MagicRegen.ToString("F4");
-        Rage        = _save.Rage.ToString("F4");
-        RageRegen   = _save.RageRegen.ToString("F4");
-        RedOrbs     = _save.RedOrbs.ToString("n0");
-        XPos        = _save.XPos.ToString("F5");
-        YPos        = _save.YPos.ToString("F5");
-        ZPos        = _save.ZPos.ToString("F5");
+        _populating = true;
+        try { PopulateCore(); }
+        finally { _populating = false; }
+        IsModified = false;
+    }
+
+    private void PopulateCore()
+    {
+        Health      = _save.Health.ToString("F4", Culture);
+        HealthRegen = _save.HealthRegen.ToString("F4", Culture);
+        Magic       = _save.Magic.ToString("F4", Culture);
+        MagicRegen  = _save.MagicRegen.ToString("F4", Culture);
+        Rage        = _save.Rage.ToString("F4", Culture);
+        RageRegen   = _save.RageRegen.ToString("F4", Culture);
+        RedOrbs     = _save.RedOrbs.ToString("n0", Culture);
+        XPos        = _save.XPos.ToString("F5", Culture);
+        YPos        = _save.YPos.ToString("F5", Culture);
+        ZPos        = _save.ZPos.ToString("F5", Culture);
         Swimming    = _save.Swimming;
         Frozen      = _save.Frozen;
         GorgonEyes  = _save.GorgonEyes.ToString();
@@ -330,14 +362,14 @@ public class GoWAViewModel : ReactiveObject
         OathLvl   = _save.WeaponLevels[6].ToString();
         EyesLvl   = _save.WeaponLevels[7].ToString();
 
-        BladesOrbs = _save.WeaponOrbs[0].ToString("n0");
-        ElecOrbs   = _save.WeaponOrbs[1].ToString("n0");
-        FireOrbs   = _save.WeaponOrbs[2].ToString("n0");
-        IceOrbs    = _save.WeaponOrbs[3].ToString("n0");
-        SoulOrbs   = _save.WeaponOrbs[4].ToString("n0");
-        AmuletOrbs = _save.WeaponOrbs[5].ToString("n0");
-        OathOrbs   = _save.WeaponOrbs[6].ToString("n0");
-        EyesOrbs   = _save.WeaponOrbs[7].ToString("n0");
+        BladesOrbs = _save.WeaponOrbs[0].ToString("n0", Culture);
+        ElecOrbs   = _save.WeaponOrbs[1].ToString("n0", Culture);
+        FireOrbs   = _save.WeaponOrbs[2].ToString("n0", Culture);
+        IceOrbs    = _save.WeaponOrbs[3].ToString("n0", Culture);
+        SoulOrbs   = _save.WeaponOrbs[4].ToString("n0", Culture);
+        AmuletOrbs = _save.WeaponOrbs[5].ToString("n0", Culture);
+        OathOrbs   = _save.WeaponOrbs[6].ToString("n0", Culture);
+        EyesOrbs   = _save.WeaponOrbs[7].ToString("n0", Culture);
 
         BladesUnl = _save.WeaponUnlocked[0];
         ElecUnl   = _save.WeaponUnlocked[1];
@@ -366,41 +398,38 @@ public class GoWAViewModel : ReactiveObject
     }
 
     // --- Push UI values to save model ---
+    private static readonly CultureInfo Culture = CultureInfo.CurrentCulture;
+    private static bool TryF(string s, out float v) => float.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, Culture, out v);
+    private static bool TryI(string s, out int v)   => int.TryParse(s, NumberStyles.Integer | NumberStyles.AllowThousands, Culture, out v);
+    private static int IntOr(string s, int fallback) => TryI(s, out var v) ? v : fallback;
+
     private void PushToSave()
     {
-        if (float.TryParse(Health, out var h)) _save.Health = h;
-        if (float.TryParse(HealthRegen, out var hr)) _save.HealthRegen = hr;
-        if (float.TryParse(Magic, out var m)) _save.Magic = m;
-        if (float.TryParse(MagicRegen, out var mr)) _save.MagicRegen = mr;
-        if (float.TryParse(Rage, out var r)) _save.Rage = r;
-        if (float.TryParse(RageRegen, out var rr)) _save.RageRegen = rr;
-        if (int.TryParse(RedOrbs.Replace(",", ""), out var ro)) _save.RedOrbs = ro;
-        if (float.TryParse(XPos, out var x)) _save.XPos = x;
-        if (float.TryParse(YPos, out var y)) _save.YPos = y;
-        if (float.TryParse(ZPos, out var z)) _save.ZPos = z;
+        if (TryF(Health, out var h)) _save.Health = h;
+        if (TryF(HealthRegen, out var hr)) _save.HealthRegen = hr;
+        if (TryF(Magic, out var m)) _save.Magic = m;
+        if (TryF(MagicRegen, out var mr)) _save.MagicRegen = mr;
+        if (TryF(Rage, out var r)) _save.Rage = r;
+        if (TryF(RageRegen, out var rr)) _save.RageRegen = rr;
+        if (TryI(RedOrbs, out var ro)) _save.RedOrbs = ro;
+        if (TryF(XPos, out var x)) _save.XPos = x;
+        if (TryF(YPos, out var y)) _save.YPos = y;
+        if (TryF(ZPos, out var z)) _save.ZPos = z;
         _save.Swimming = Swimming;
         _save.Frozen = Frozen;
-        if (int.TryParse(GorgonEyes, out var ge)) _save.GorgonEyes = ge;
-        if (int.TryParse(PhoenixFeathers, out var pf)) _save.PhoenixFeathers = pf;
-        if (int.TryParse(SubwepAmmo, out var sa)) _save.SubWeaponAmmo = sa;
+        if (TryI(GorgonEyes, out var ge)) _save.GorgonEyes = ge;
+        if (TryI(PhoenixFeathers, out var pf)) _save.PhoenixFeathers = pf;
+        if (TryI(SubwepAmmo, out var sa)) _save.SubWeaponAmmo = sa;
         _save.Difficulty = Difficulty;
         _save.NewGamePlus = NewGamePlus;
 
-        _save.WeaponLevels[0] = int.TryParse(BladesLvl, out var bl) ? bl : 1;
-        _save.WeaponLevels[1] = int.TryParse(ElecLvl, out var el) ? el : 1;
-        _save.WeaponLevels[2] = int.TryParse(FireLvl, out var fl) ? fl : 1;
-        _save.WeaponLevels[3] = int.TryParse(IceLvl, out var il) ? il : 1;
-        _save.WeaponLevels[4] = int.TryParse(SoulLvl, out var sl) ? sl : 1;
-        _save.WeaponLevels[6] = int.TryParse(OathLvl, out var ol) ? ol : 1;
-        _save.WeaponLevels[7] = int.TryParse(EyesLvl, out var yl) ? yl : 1;
-
-        _save.WeaponOrbs[0] = int.TryParse(BladesOrbs.Replace(",", ""), out var bo) ? bo : 0;
-        _save.WeaponOrbs[1] = int.TryParse(ElecOrbs.Replace(",", ""), out var eo) ? eo : 0;
-        _save.WeaponOrbs[2] = int.TryParse(FireOrbs.Replace(",", ""), out var fo) ? fo : 0;
-        _save.WeaponOrbs[3] = int.TryParse(IceOrbs.Replace(",", ""), out var io) ? io : 0;
-        _save.WeaponOrbs[4] = int.TryParse(SoulOrbs.Replace(",", ""), out var so) ? so : 0;
-        _save.WeaponOrbs[6] = int.TryParse(OathOrbs.Replace(",", ""), out var oo) ? oo : 0;
-        _save.WeaponOrbs[7] = int.TryParse(EyesOrbs.Replace(",", ""), out var yo) ? yo : 0;
+        string[] lvls = [BladesLvl, ElecLvl, FireLvl, IceLvl, SoulLvl, AmuletLvl, OathLvl, EyesLvl];
+        string[] orbs = [BladesOrbs, ElecOrbs, FireOrbs, IceOrbs, SoulOrbs, AmuletOrbs, OathOrbs, EyesOrbs];
+        for (int i = 0; i < 8; i++)
+        {
+            _save.WeaponLevels[i] = IntOr(lvls[i], 1);
+            _save.WeaponOrbs[i]   = IntOr(orbs[i], 0);
+        }
 
         _save.WeaponUnlocked[0] = BladesUnl;
         _save.WeaponUnlocked[1] = ElecUnl;
@@ -427,55 +456,71 @@ public class GoWAViewModel : ReactiveObject
     }
 
     // --- Inventory sync helpers ---
-    private void SyncWeaponToInv(int weaponIdx, bool unlocked)
-    {
-        if (weaponIdx < 1 || weaponIdx > 4) return;
-        int rageId = weaponIdx switch
-        {
-            1 => 0x08, // RageModeElectric
-            2 => 0x0A, // RageModeFire
-            3 => 0x0B, // RageModeIce
-            4 => 0x0C, // RageModeSoul
-            _ => -1
-        };
-        if (rageId >= 0 && rageId < InventoryItems.Count)
-            InventoryItems[rageId].IsChecked = unlocked;
-    }
+    private bool _populating;
 
-    private void SyncSubWeaponToInv()
+    /// <summary>VB chkWepUnl_click + chkEleUnl_Click.</summary>
+    private void OnWeaponUnlockChanged(int idx, bool unlocked)
     {
-        // Clear all sub-weapon items (0x1B through 0x2F)
-        for (int i = 0; i < 21; i++)
+        IsModified = true;
+        if (_populating) return;   // loading a slot: inventory is restored from the file afterwards
+
+        SetInv(GoWASave.WeaponIds[idx], unlocked);
+
+        if (idx < 5)
         {
-            int invIdx = 0x1B + i;
-            if (invIdx < InventoryItems.Count)
-            InventoryItems[invIdx].IsChecked = false;
+            if (!unlocked)
+            {
+                switch (idx)
+                {
+                    case 0: BladesSel = false; break;
+                    case 1: ElecSel = false; break;
+                    case 2: FireSel = false; break;
+                    case 3: IceSel = false; break;
+                    case 4: SoulSel = false; break;
+                }
+            }
+            // Element rage items: Elec 0x08, Fire 0x0A, Ice 0x0B, Soul 0x0C
+            if (idx > 0)
+                SetInv(idx == 1 ? 0x08 : idx + 8, unlocked);
         }
 
-        if (SubWeaponIndex == 0) return;
+        // With no element unlocked, the starting (non-elemental) rage 0x09 is used
+        if (idx is >= 1 and <= 4)
+            SetInv(0x09, !(ElecUnl || FireUnl || IceUnl || SoulUnl));
+    }
 
-        if (SubWeaponIndex == 1)
+    private void SetInv(int id, bool value)
+    {
+        if (id >= 0 && id < InventoryItems.Count) InventoryItems[id].IsChecked = value;
+    }
+
+    /// <summary>VB cmbSubwep_Changed.</summary>
+    private void SyncSubWeaponToInv()
+    {
+        if (_populating) return;
+
+        for (int i = 0; i <= 20; i++) SetInv(0x1B + i, false);
+
+        int idx = SubWeaponIndex;
+        if (idx == 1) SetInv(0x1B, true);   // Bare Fists
+        if (idx < 2)
         {
-            if (0x1B < InventoryItems.Count)
-                InventoryItems[0x1B].IsChecked = true; // Bare Fists
             SubwepGlitchEnabled = false;
             SubwepGlitch = false;
             return;
         }
 
         SubwepGlitchEnabled = true;
-        int idx = SubWeaponIndex - 1;
-        int subIdx = 0x1B + idx + (idx / 3);
-        int baseIdx = (idx / 3) * 4 + 31;
-        if (subIdx < InventoryItems.Count)
-            InventoryItems[subIdx].IsChecked = true;
-        if (baseIdx < InventoryItems.Count)
-            InventoryItems[baseIdx].IsChecked = true;
+        SubwepGlitch = false;
+        idx -= 1;
+        int grp = (idx - 1) / 3;
+        SetInv(0x1B + idx + grp, true);     // the sub-weapon level item
+        SetInv(grp * 4 + 31, true);         // its "Base" item
     }
 
     private void SyncSubwepGlitchToInv()
     {
-        if (!SubwepGlitchEnabled) return;
+        if (_populating || !SubwepGlitchEnabled) return;
         int wepIdx = SubWeaponIndex - 2;
         int wepGrp = wepIdx / 3;
         wepIdx = wepIdx - wepGrp * 3 + wepGrp * 4 + 28;
@@ -485,6 +530,7 @@ public class GoWAViewModel : ReactiveObject
 
     private void SyncCostumeToInv()
     {
+        if (_populating) return;
         for (int i = 0; i < GoWASave.TorsoIds.Length; i++)
         {
             int id = GoWASave.TorsoIds[i];
@@ -509,25 +555,66 @@ public class GoWAViewModel : ReactiveObject
 
     private void Open()
     {
+        if (string.IsNullOrWhiteSpace(Folder) || !Directory.Exists(Folder))
+        {
+            StatusText = $"Folder not found: {Folder}";
+            return;
+        }
+
         _save.FolderPath = Folder;
-        _save.Channel = SelectedChannel;
-        string? err = _save.Load();
-        if (err != null) return;
-        PopulateFromSave();
-        IsLoaded = true;
+
+        // The original editor shows the 31 slot buttons before checking DAT-1,
+        // so an empty/invalid slot 1 never locks you out of the other slots.
         ShowData = true;
         ShowBrowse = false;
         ShowOpen = false;
+
+        _save.Channel = SelectedChannel;
+        string? firstError = _save.Load();
+        if (firstError == null)
+        {
+            PopulateFromSave();
+            IsLoaded = true;
+            StatusText = $"Loaded slot {SelectedChannel}. Pick another slot above to switch.";
+            return;
+        }
+
+        // Slot 1 didn't load: look for the first slot that does
+        for (int ch = 1; ch <= 31; ch++)
+        {
+            if (ch == SelectedChannel) continue;
+            _save.Channel = ch;
+            if (_save.Load() == null)
+            {
+                SelectedChannel = ch;
+                PopulateFromSave();
+                IsLoaded = true;
+                StatusText = $"{firstError}\nLoaded slot {ch} instead.";
+                return;
+            }
+        }
+
+        _save.Channel = SelectedChannel;
+        IsLoaded = false;
+        StatusText = firstError + "\nNo valid DAT-1 … DAT-31 file was found in this folder.";
     }
 
     private void Save()
     {
+        if (!IsLoaded) { StatusText = "Open a valid slot first."; return; }
         PushToSave();
         _save.FolderPath = Folder;
         _save.Channel = SelectedChannel;
         string? err = _save.Save();
         if (err == null)
+        {
             IsModified = false;
+            StatusText = $"Saved slot {SelectedChannel}.";
+        }
+        else
+        {
+            StatusText = err;
+        }
     }
 }   
 

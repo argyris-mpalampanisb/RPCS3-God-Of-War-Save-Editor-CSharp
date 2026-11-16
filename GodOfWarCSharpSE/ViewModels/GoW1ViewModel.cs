@@ -34,8 +34,18 @@ public partial class GoW1ViewModel : ObservableObject
 
     // --- Folder / Slot state ---
     [ObservableProperty] private string _folder = "";
-    [ObservableProperty] private bool _isLoaded;
-    [ObservableProperty] private bool _isMaster;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSlotLoaded))]
+    private bool _isLoaded;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSlotLoaded))]
+    private bool _isMaster;
+
+    /// <summary>True when a DATA0x slot (not MASTER.BIN) is loaded: drives the editor tabs.</summary>
+    public bool IsSlotLoaded => IsLoaded && !IsMaster;
+
+    [ObservableProperty] private string _statusText = "";
     [ObservableProperty] private int _selectedSlot = -1;
 
     // --- Master flags ---
@@ -154,25 +164,38 @@ public partial class GoW1ViewModel : ObservableObject
     [RelayCommand]
     private void Open()
     {
-        if (!Directory.Exists(Folder)) return;
+        if (!Directory.Exists(Folder)) { StatusText = $"Folder not found: {Folder}"; return; }
         if (_save.Load(Folder, -1))
         {
             IsLoaded = true;
             IsMaster = true;
             SelectedSlot = -1;
             LoadMasterValues();
+            StatusText = "Loaded MASTER.BIN. Pick a slot above to edit it.";
+        }
+        else
+        {
+            StatusText = _save.LastError;
         }
     }
 
+    // CommandParameter="0" in XAML arrives as a string, not an int. With an
+    // int parameter the toolkit rejected it, so the slot buttons never worked.
     [RelayCommand]
-    private void SelectSlot(int slot)
+    private void SelectSlot(object? parameter)
     {
+        if (!int.TryParse(parameter?.ToString(), out int slot)) return;
         if (_save.Load(Folder, slot))
         {
             IsLoaded = true;
             IsMaster = false;
             SelectedSlot = slot;
             LoadSlotValues();
+            StatusText = $"Loaded slot {slot + 1} ({_save.DataPath})";
+        }
+        else
+        {
+            StatusText = _save.LastError;
         }
     }
 
@@ -191,18 +214,22 @@ public partial class GoW1ViewModel : ObservableObject
     [RelayCommand]
     private void Save()
     {
-        if (_save.IsMaster)
-            WriteMasterValues();
-        else
-            WriteSlotValues();
+        if (!IsLoaded) { StatusText = "Open a save first."; return; }
+
+        if (_save.IsMaster) WriteMasterValues();
+        else WriteSlotValues();
 
         if (_save.Save())
+        {
             Checksum = _save.Checksum;
+            StatusText = $"Saved {_save.Filename}.";
+        }
     }
 
     [RelayCommand]
     private void Restart()
     {
+        if (!IsSlotLoaded) { StatusText = "Select a slot first."; return; }
         var asm = Assembly.GetExecutingAssembly();
         using var ms = asm.GetManifestResourceStream("GodOfWarCSharpSE.Data.G1BlankSave.BIN");
         byte[] blank = [];

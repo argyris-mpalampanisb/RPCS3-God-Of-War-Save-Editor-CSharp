@@ -5,7 +5,8 @@
         x:DataType="vm:GoW3ViewModel"
         Title="CSharp GoW3 Save Editor"
         Width="640" Height="700"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        FontSize="12">
 
   <DockPanel Margin="8">
 

@@ -113,20 +113,34 @@ public class GoWASave
 
         string path = Path.Combine(FolderPath, FileName);
         if (!File.Exists(path))
-            return $"File not found: {path}";
+            return $"Slot {Channel}: {FileName} not found in {FolderPath}";
 
-        Bytes = File.ReadAllBytes(path);
+        byte[] data = File.ReadAllBytes(path);
 
-        if (Bytes.Length == 0 || Bytes[0] != 0xC0)
-            return "Invalid save file. Opening byte is not 0xC0.";
+        // VB: "This file's opening bytes are not GoW-standard. Decryption has failed or save slot is empty."
+        if (data.Length == 0 || data[0] != 0xC0)
+        {
+            if (File.Exists(Path.Combine(FolderPath, "PARAM.PFD")))
+                return $"Slot {Channel}: {FileName} looks encrypted (first byte 0x{(data.Length > 0 ? data[0] : 0):X2}, " +
+                       "expected 0xC0, and PARAM.PFD is present). Saves copied from a real PS3 must be " +
+                       "decrypted first, e.g. with Apollo Save Tool.";
+            return $"Slot {Channel}: {FileName} is empty or not an Ascension save " +
+                   $"(first byte 0x{(data.Length > 0 ? data[0] : 0):X2}, expected 0xC0).";
+        }
 
-        KPtr = IndexOf(Bytes, KptrPattern);
-        if (KPtr == -1)
-            return "Failed to locate kptr pattern in save file.";
+        int kptr = IndexOf(data, KptrPattern);
+        if (kptr == -1)
+            return $"Slot {Channel}: could not find the character block (kptr pattern 00 00 03 24).";
+        int kptr2 = IndexOf(data, Kptr2Pattern) - 4;
+        if (kptr2 < 0)
+            return $"Slot {Channel}: could not find the settings block (kptr2 pattern 04 FF 00 00).";
 
-        KPtr2 = IndexOf(Bytes, Kptr2Pattern) - 4;
-        if (KPtr2 < 0)
-            return "Failed to locate kptr2 pattern in save file.";
+        // Only replace the loaded state once the new file is known to be valid
+        Bytes = data;
+        ResetFields();
+
+        KPtr = kptr;
+        KPtr2 = kptr2;
 
         // Read character stats
         Health      = ReadSingle(KPtr + OffHealth);
@@ -165,11 +179,7 @@ public class GoWASave
 
             int sIdx = Array.IndexOf(SubWeaponIds, itemId);
             if (sIdx >= 0)
-            {
                 SubWeaponIndex = sIdx + 1;
-                if (sIdx > 1)
-                    SubWeaponGlitch = !Inventory[(int)Math.Floor((double)(sIdx - 2) / 3) * 4 + 31];
-            }
 
             int tIdx = Array.IndexOf(TorsoIds, itemId);
             if (tIdx >= 0) TorsoIndex = tIdx + 1;
@@ -177,6 +187,9 @@ public class GoWASave
             int pIdx = Array.IndexOf(PantsIds, itemId);
             if (pIdx >= 0) PantsIndex = pIdx + 1;
         }
+
+        if (SubWeaponIndex > 1)
+            SubWeaponGlitch = !Inventory[(SubWeaponIndex - 2) / 3 * 4 + 31];
 
         GorgonEyes      = Bytes[KPtr + OffGorgonEyes];
         PhoenixFeathers = Bytes[KPtr + OffPhoenixFea];
@@ -188,6 +201,21 @@ public class GoWASave
         Modified = false;
         IsLoaded = true;
         return null;
+    }
+
+    /// <summary>Mirror of the VB ClearValues(): wipe values left over from the previous slot.</summary>
+    private void ResetFields()
+    {
+        WeaponLevels   = [1, 1, 1, 1, 1, 1, 1, 1];
+        WeaponOrbs     = [0, 0, 0, 0, 0, 0, 0, 0];
+        WeaponUnlocked = new bool[8];
+        WeaponSelected = new bool[8];
+        SubWeaponIndex = 0;
+        SubWeaponGlitch = false;
+        TorsoIndex = 0;
+        PantsIndex = 0;
+        Swimming = Frozen = NewGamePlus = false;
+        Array.Clear(Inventory);
     }
 
     // --- Save ---
@@ -209,7 +237,7 @@ public class GoWASave
         WriteSingle(KPtr + OffZPos, ZPos);
 
         Bytes[KPtr + OffSwim] = Swimming ? (byte)0x50 : (byte)0x08;
-        Bytes[KPtr + OffFrozen] = Frozen ? (byte)1 : (byte)0xFF;
+        Bytes[KPtr + OffFrozen] = Frozen ? (byte)1 : (byte)0;
 
         bool noEleSel = true;
         int invCount = 0;
@@ -217,7 +245,6 @@ public class GoWASave
         for (int id = 0; id < Inventory.Length; id++)
         {
             if (!Inventory[id]) continue;
-            if (invCount >= 64) break;
 
             int loc = KPtr + OffInvStart + 16 * invCount;
             if (loc + 16 > Bytes.Length) break;
@@ -231,7 +258,7 @@ public class GoWASave
             {
                 Bytes[loc + 4] = (byte)(WeaponLevels[wIdx] - 1);
                 if (wIdx < 5)
-                    Bytes[loc + 6] = WeaponSelected[wIdx] ? (byte)0xFF : (byte)0;
+                    Bytes[loc + 6] = WeaponSelected[wIdx] ? (byte)1 : (byte)0;
                 else
                     Bytes[loc + 6] = 0;
                 int orbs = WeaponOrbs[wIdx];
@@ -261,7 +288,7 @@ public class GoWASave
         Bytes[KPtr + OffSubwepAmmo]   = (byte)SubWeaponAmmo;
 
         Bytes[KPtr2 + Off2Difficulty] = (byte)Difficulty;
-        Bytes[KPtr2 + Off2NGPlus]     = NewGamePlus ? (byte)0xFF : (byte)0;
+        Bytes[KPtr2 + Off2NGPlus]     = NewGamePlus ? (byte)1 : (byte)0;
 
         string path = Path.Combine(FolderPath, FileName);
         File.WriteAllBytes(path, Bytes);
