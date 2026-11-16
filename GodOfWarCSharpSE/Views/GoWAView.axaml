@@ -1,0 +1,281 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GodOfWarCSharpSE.ViewModels"
+        xmlns:conv="using:GodOfWarCSharpSE.Converters"
+        x:Class="GodOfWarCSharpSE.Views.GoWAView"
+        x:DataType="vm:GoWAViewModel"
+        Title="God of War Ascension Save Editor"
+        Width="620" Height="560"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <conv:IntToRadioConverter x:Key="IntToRadio0" TargetValue="0"/>
+        <conv:IntToRadioConverter x:Key="IntToRadio1" TargetValue="1"/>
+        <conv:IntToRadioConverter x:Key="IntToRadio2" TargetValue="2"/>
+        <conv:IntToRadioConverter x:Key="IntToRadio3" TargetValue="3"/>
+    </Window.Resources>
+
+    <Window.Styles>
+        <Style Selector="Button.ch">
+            <Setter Property="MinWidth" Value="28"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Padding" Value="4,0"/>
+            <Setter Property="Background" Value="#C0C0C0"/>
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+    </Window.Styles>
+
+    <DockPanel Margin="8">
+        <!-- Top bar -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="0,0,0,6">
+            <TextBlock Text="File:" VerticalAlignment="Center"/>
+            <TextBox Width="340" Text="{Binding Folder}"/>
+            <Button Content="Browse" Command="{Binding BrowseCommand}"
+                    IsVisible="{Binding ShowBrowse}"/>
+            <Button Content="Open" Command="{Binding OpenCommand}"
+                    IsVisible="{Binding ShowOpen}"/>
+            <Button Content="Save" Command="{Binding SaveCommand}"
+                    IsVisible="{Binding IsLoaded}"/>
+        </StackPanel>
+
+        <!-- Channel buttons -->
+        <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,6"
+                   IsVisible="{Binding ShowData}">
+            <Button Classes="ch" Content="1"  Command="{Binding ChannelCommand}" CommandParameter="1"/>
+            <Button Classes="ch" Content="2"  Command="{Binding ChannelCommand}" CommandParameter="2"/>
+            <Button Classes="ch" Content="3"  Command="{Binding ChannelCommand}" CommandParameter="3"/>
+            <Button Classes="ch" Content="4"  Command="{Binding ChannelCommand}" CommandParameter="4"/>
+            <Button Classes="ch" Content="5"  Command="{Binding ChannelCommand}" CommandParameter="5"/>
+            <Button Classes="ch" Content="6"  Command="{Binding ChannelCommand}" CommandParameter="6"/>
+            <Button Classes="ch" Content="7"  Command="{Binding ChannelCommand}" CommandParameter="7"/>
+            <Button Classes="ch" Content="8"  Command="{Binding ChannelCommand}" CommandParameter="8"/>
+            <Button Classes="ch" Content="9"  Command="{Binding ChannelCommand}" CommandParameter="9"/>
+            <Button Classes="ch" Content="10" Command="{Binding ChannelCommand}" CommandParameter="10"/>
+            <Button Classes="ch" Content="11" Command="{Binding ChannelCommand}" CommandParameter="11"/>
+            <Button Classes="ch" Content="12" Command="{Binding ChannelCommand}" CommandParameter="12"/>
+            <Button Classes="ch" Content="13" Command="{Binding ChannelCommand}" CommandParameter="13"/>
+            <Button Classes="ch" Content="14" Command="{Binding ChannelCommand}" CommandParameter="14"/>
+            <Button Classes="ch" Content="15" Command="{Binding ChannelCommand}" CommandParameter="15"/>
+            <Button Classes="ch" Content="16" Command="{Binding ChannelCommand}" CommandParameter="16"/>
+            <Button Classes="ch" Content="17" Command="{Binding ChannelCommand}" CommandParameter="17"/>
+            <Button Classes="ch" Content="18" Command="{Binding ChannelCommand}" CommandParameter="18"/>
+            <Button Classes="ch" Content="19" Command="{Binding ChannelCommand}" CommandParameter="19"/>
+            <Button Classes="ch" Content="20" Command="{Binding ChannelCommand}" CommandParameter="20"/>
+            <Button Classes="ch" Content="21" Command="{Binding ChannelCommand}" CommandParameter="21"/>
+            <Button Classes="ch" Content="22" Command="{Binding ChannelCommand}" CommandParameter="22"/>
+            <Button Classes="ch" Content="23" Command="{Binding ChannelCommand}" CommandParameter="23"/>
+            <Button Classes="ch" Content="24" Command="{Binding ChannelCommand}" CommandParameter="24"/>
+            <Button Classes="ch" Content="25" Command="{Binding ChannelCommand}" CommandParameter="25"/>
+            <Button Classes="ch" Content="26" Command="{Binding ChannelCommand}" CommandParameter="26"/>
+            <Button Classes="ch" Content="27" Command="{Binding ChannelCommand}" CommandParameter="27"/>
+            <Button Classes="ch" Content="28" Command="{Binding ChannelCommand}" CommandParameter="28"/>
+            <Button Classes="ch" Content="29" Command="{Binding ChannelCommand}" CommandParameter="29"/>
+            <Button Classes="ch" Content="30" Command="{Binding ChannelCommand}" CommandParameter="30"/>
+            <Button Classes="ch" Content="31" Command="{Binding ChannelCommand}" CommandParameter="31"/>
+            <Button Classes="ch" Content="Checkpoint" MinWidth="80"
+                    Command="{Binding ChannelCommand}" CommandParameter="31"/>
+        </WrapPanel>
+
+        <!-- Tabs -->
+        <TabControl IsVisible="{Binding ShowData}">
+
+            <!-- CHARACTER TAB -->
+            <TabItem Header="Character">
+                <ScrollViewer>
+                    <StackPanel Margin="8" Spacing="6">
+                        <Grid ColumnDefinitions="Auto,90,Auto,90" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Health" VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Health}" Margin="0,0,16,0"/>
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Regen Speed" VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding HealthRegen}"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Magic" VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Magic}" Margin="0,0,16,0"/>
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Regen Speed" VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding MagicRegen}"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Rage" VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Rage}" Margin="0,0,16,0"/>
+                            <TextBlock Grid.Row="2" Grid.Column="2" Text="Regen Speed" VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding RageRegen}"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Red Orbs" VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding RedOrbs}"/>
+
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Gorgon Eyes" VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding GorgonEyes}" Margin="0,0,16,0"/>
+                            <TextBlock Grid.Row="4" Grid.Column="2" Text="Phoenix Feathers" VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="4" Grid.Column="3" Text="{Binding PhoenixFeathers}"/>
+
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Sub-weapon Ammo" VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding SubwepAmmo}"/>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,70,Auto,70,Auto,70" Margin="0,4,0,0">
+                            <TextBlock Text="X Pos" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding XPos}" Margin="0,0,12,0"/>
+                            <TextBlock Text="Y Pos" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding YPos}" Margin="0,0,12,0"/>
+                            <TextBlock Text="Height" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding ZPos}"/>
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                            <CheckBox IsChecked="{Binding Swimming}" Content="Swimming"/>
+                            <CheckBox IsChecked="{Binding Frozen}" Content="Frozen for Cutscene"/>
+                            <CheckBox IsChecked="{Binding NewGamePlus}" Content="New Game+"/>
+                        </StackPanel>
+
+                        <GroupBox Header="Difficulty" Padding="8" Margin="0,4,0,0">
+                            <StackPanel Spacing="2">
+                                <RadioButton GroupName="Diff" Content="Easy"
+                                             IsChecked="{Binding Difficulty, Converter={StaticResource IntToRadio0}, Mode=TwoWay}"/>
+                                <RadioButton GroupName="Diff" Content="Normal"
+                                             IsChecked="{Binding Difficulty, Converter={StaticResource IntToRadio1}, Mode=TwoWay}"/>
+                                <RadioButton GroupName="Diff" Content="Hard"
+                                             IsChecked="{Binding Difficulty, Converter={StaticResource IntToRadio2}, Mode=TwoWay}"/>
+                                <RadioButton GroupName="Diff" Content="Very Hard"
+                                             IsChecked="{Binding Difficulty, Converter={StaticResource IntToRadio3}, Mode=TwoWay}"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- EQUIPMENT TAB -->
+            <TabItem Header="Equipment">
+                <DockPanel Margin="8">
+                    <!-- Right: Inventory -->
+                    <ScrollViewer DockPanel.Dock="Right" Width="250" Margin="8,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Untested Inventory Items - Change at own risk"
+                                       Foreground="#E07000" FontSize="11"
+                                       TextWrapping="Wrap" Margin="0,0,0,4"/>
+                            <ListBox Height="380"
+                                     ItemsSource="{Binding InventoryItems}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="vm:InventoryItem">
+                                        <CheckBox Content="{Binding Name}"
+                                                  IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Left: Weapons + Costume -->
+                    <StackPanel Spacing="8">
+                        <GroupBox Header="Weapons" Padding="8">
+                            <StackPanel Spacing="3">
+                                <Grid ColumnDefinitions="55,35,65,55,55">
+                                    <TextBlock Grid.Column="1" Text="Level" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="2" Text="Orbs Spent" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="3" Text="Unlocked" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="4" Text="Selected" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="55,35,65,55,55">
+                                    <TextBlock Grid.Column="0" Text="Blades" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Column="1" Text="{Binding BladesLvl}" Width="30"/>
+                                    <TextBox Grid.Column="2" Text="{Binding BladesOrbs}" Width="58"/>
+                                    <CheckBox Grid.Column="3" IsChecked="{Binding BladesUnl}" HorizontalAlignment="Center"/>
+                                    <CheckBox Grid.Column="4" IsChecked="{Binding BladesSel}" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="55,35,65,55,55">
+                                    <TextBlock Grid.Column="0" Text="Electric" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Column="1" Text="{Binding ElecLvl}" Width="30"/>
+                                    <TextBox Grid.Column="2" Text="{Binding ElecOrbs}" Width="58"/>
+                                    <CheckBox Grid.Column="3" IsChecked="{Binding ElecUnl}" HorizontalAlignment="Center"/>
+                                    <CheckBox Grid.Column="4" IsChecked="{Binding ElecSel}" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="55,35,65,55,55">
+                                    <TextBlock Grid.Column="0" Text="Fire" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Column="1" Text="{Binding FireLvl}" Width="30"/>
+                                    <TextBox Grid.Column="2" Text="{Binding FireOrbs}" Width="58"/>
+                                    <CheckBox Grid.Column="3" IsChecked="{Binding FireUnl}" HorizontalAlignment="Center"/>
+                                    <CheckBox Grid.Column="4" IsChecked="{Binding FireSel}" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="55,35,65,55,55">
+                                    <TextBlock Grid.Column="0" Text="Ice" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Column="1" Text="{Binding IceLvl}" Width="30"/>
+                                    <TextBox Grid.Column="2" Text="{Binding IceOrbs}" Width="58"/>
+                                    <CheckBox Grid.Column="3" IsChecked="{Binding IceUnl}" HorizontalAlignment="Center"/>
+                                    <CheckBox Grid.Column="4" IsChecked="{Binding IceSel}" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="55,35,65,55,55">
+                                    <TextBlock Grid.Column="0" Text="Soul" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Column="1" Text="{Binding SoulLvl}" Width="30"/>
+                                    <TextBox Grid.Column="2" Text="{Binding SoulOrbs}" Width="58"/>
+                                    <CheckBox Grid.Column="3" IsChecked="{Binding SoulUnl}" HorizontalAlignment="Center"/>
+                                    <CheckBox Grid.Column="4" IsChecked="{Binding SoulSel}" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="55,35,65,55,55">
+                                    <TextBlock Grid.Column="0" Text="Amulet" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Column="1" Text="{Binding AmuletLvl}" Width="30"/>
+                                    <TextBox Grid.Column="2" Text="{Binding AmuletOrbs}" Width="58"/>
+                                    <CheckBox Grid.Column="3" IsChecked="{Binding AmuletUnl}" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="55,35,65,55,55">
+                                    <TextBlock Grid.Column="0" Text="Oath Stone" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Column="1" Text="{Binding OathLvl}" Width="30"/>
+                                    <TextBox Grid.Column="2" Text="{Binding OathOrbs}" Width="58"/>
+                                    <CheckBox Grid.Column="3" IsChecked="{Binding OathUnl}" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="55,35,65,55,55">
+                                    <TextBlock Grid.Column="0" Text="Eyes" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Column="1" Text="{Binding EyesLvl}" Width="30"/>
+                                    <TextBox Grid.Column="2" Text="{Binding EyesOrbs}" Width="58"/>
+                                    <CheckBox Grid.Column="3" IsChecked="{Binding EyesUnl}" HorizontalAlignment="Center"/>
+                                </Grid>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="Sub-weapon" Padding="8">
+                            <StackPanel Spacing="4">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Type:" VerticalAlignment="Center"/>
+                                    <ComboBox Width="130"
+                                              ItemsSource="{Binding SubWeaponNames}"
+                                              SelectedIndex="{Binding SubWeaponIndex}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Ammo:" VerticalAlignment="Center"/>
+                                    <TextBox Text="{Binding SubwepAmmo}" Width="30"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Glitched version?" VerticalAlignment="Center"/>
+                                    <CheckBox IsChecked="{Binding SubwepGlitch}"
+                                              IsEnabled="{Binding SubwepGlitchEnabled}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="Costume" Padding="8">
+                            <StackPanel Spacing="4">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Body:" VerticalAlignment="Center"/>
+                                    <ComboBox Width="130"
+                                              ItemsSource="{Binding TorsoNames}"
+                                              SelectedIndex="{Binding TorsoIndex}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Pants:" VerticalAlignment="Center"/>
+                                    <ComboBox Width="130"
+                                              ItemsSource="{Binding PantsNames}"
+                                              SelectedIndex="{Binding PantsIndex}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

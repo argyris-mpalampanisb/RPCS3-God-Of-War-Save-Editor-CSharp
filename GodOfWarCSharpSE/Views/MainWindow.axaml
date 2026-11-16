@@ -1,0 +1,17 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GodOfWarCSharpSE.ViewModels"
+        x:Class="GodOfWarCSharpSE.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="CSharp RPCS3 God Of War Save Editor"
+        Width="300" Height="200"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False">
+
+  <StackPanel Margin="16" Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Button Content="God of War 1" Command="{Binding OpenGoW1Command}" HorizontalAlignment="Stretch" />
+    <Button Content="God of War 2" Command="{Binding OpenGoW2Command}" HorizontalAlignment="Stretch" />
+    <Button Content="God of War 3" Command="{Binding OpenGoW3Command}" HorizontalAlignment="Stretch" />
+    <Button Content="God of War Ascension" Command="{Binding OpenGoACommand}" HorizontalAlignment="Stretch" />
+  </StackPanel>
+</Window>

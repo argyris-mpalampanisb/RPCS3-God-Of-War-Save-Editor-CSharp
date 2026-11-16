@@ -1,0 +1,240 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GodOfWarCSharpSE.ViewModels"
+        x:Class="GodOfWarCSharpSE.Views.GoW2View"
+        x:DataType="vm:GoW2ViewModel"
+        Title="CSharp GoW2 Save Editor"
+        Width="620" Height="550"
+        WindowStartupLocation="CenterScreen">
+
+  <DockPanel Margin="8">
+
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="0,0,0,8">
+      <TextBlock Text="Folder:" VerticalAlignment="Center" />
+      <TextBox Text="{Binding Folder}" Width="350" />
+      <Button Content="Browse" Command="{Binding BrowseCommand}" />
+      <Button Content="Open" Command="{Binding OpenCommand}" />
+      <Button Content="Save" Command="{Binding SaveCommand}" />
+    </StackPanel>
+
+    <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,8" IsVisible="{Binding IsLoaded}">
+      <Button Content="Master" Command="{Binding SelectMasterCommand}" Margin="0,0,4,4" />
+      <Button Content="Slot 1" Command="{Binding SelectSlotCommand}" CommandParameter="0" Margin="0,0,4,4" />
+      <Button Content="Slot 2" Command="{Binding SelectSlotCommand}" CommandParameter="1" Margin="0,0,4,4" />
+      <Button Content="Slot 3" Command="{Binding SelectSlotCommand}" CommandParameter="2" Margin="0,0,4,4" />
+      <Button Content="Slot 4" Command="{Binding SelectSlotCommand}" CommandParameter="3" Margin="0,0,4,4" />
+      <Button Content="Slot 5" Command="{Binding SelectSlotCommand}" CommandParameter="4" Margin="0,0,4,4" />
+      <Button Content="Slot 6" Command="{Binding SelectSlotCommand}" CommandParameter="5" Margin="0,0,4,4" />
+      <Button Content="Slot 7" Command="{Binding SelectSlotCommand}" CommandParameter="6" Margin="0,0,4,4" />
+      <Button Content="Slot 8" Command="{Binding SelectSlotCommand}" CommandParameter="7" Margin="0,0,4,4" />
+      <Button Content="Slot 9" Command="{Binding SelectSlotCommand}" CommandParameter="8" Margin="0,0,4,4" />
+      <Button Content="Slot 10" Command="{Binding SelectSlotCommand}" CommandParameter="9" Margin="0,0,4,4" />
+    </WrapPanel>
+
+    <!-- Master -->
+    <Border DockPanel.Dock="Bottom" Padding="12" BorderBrush="Gray" BorderThickness="1"
+            IsVisible="{Binding IsMaster}">
+      <StackPanel Spacing="8">
+        <TextBlock Text="Master Flags" FontWeight="Bold" />
+        <CheckBox Content="20 Cyclops Eyes Collected" IsChecked="{Binding CyclopsEyesMaster}" />
+        <TextBlock Text="Difficulties Beaten" FontWeight="SemiBold" />
+        <CheckBox Content="Easy" IsChecked="{Binding BeatEMaster}" Margin="12,0,0,0" />
+        <CheckBox Content="Normal" IsChecked="{Binding BeatNMaster}" Margin="12,0,0,0" />
+        <CheckBox Content="Hard" IsChecked="{Binding BeatHMaster}" Margin="12,0,0,0" />
+        <CheckBox Content="Very Hard" IsChecked="{Binding BeatVHMaster}" Margin="12,0,0,0" />
+        <TextBlock Text="Challenge Ranks Achieved" FontWeight="SemiBold" />
+        <CheckBox Content="Mortal" IsChecked="{Binding MortalRankMaster}" Margin="12,0,0,0" />
+        <CheckBox Content="Spartan" IsChecked="{Binding SpartanRankMaster}" Margin="12,0,0,0" />
+        <CheckBox Content="God" IsChecked="{Binding GodRankMaster}" Margin="12,0,0,0" />
+        <CheckBox Content="Titan" IsChecked="{Binding TitanRankMaster}" Margin="12,0,0,0" />
+      </StackPanel>
+    </Border>
+
+    <TabControl IsVisible="{Binding IsLoaded, Converter={StaticResource InverseBool}}">
+
+      <!-- Character -->
+      <TabItem IsVisible="{Binding IsMaster, Converter={StaticResource InverseBool}}">
+        <TabItem.Header><TextBlock Text="Character" /></TabItem.Header>
+        <ScrollViewer>
+          <StackPanel Margin="8" Spacing="12">
+            <UniformGrid Columns="3" RowSpacing="8" ColumnSpacing="8">
+              <StackPanel><TextBlock Text="Health" /><TextBox Text="{Binding Health}" /></StackPanel>
+              <StackPanel><TextBlock Text="Magic" /><TextBox Text="{Binding Magic}" /></StackPanel>
+              <StackPanel><TextBlock Text="Item" /><TextBox Text="{Binding Item}" /></StackPanel>
+              <StackPanel><TextBlock Text="Rage" /><TextBox Text="{Binding Rage}" /></StackPanel>
+              <StackPanel><TextBlock Text="Magic Regen/sec" /><TextBox Text="{Binding MagicRegen}" /></StackPanel>
+              <StackPanel><TextBlock Text="Red Orbs" /><TextBox Text="{Binding RedOrbs}" /></StackPanel>
+              <StackPanel><TextBlock Text="Health Ext" /><TextBox Text="{Binding HealthExt}" /></StackPanel>
+              <StackPanel><TextBlock Text="Magic Ext" /><TextBox Text="{Binding MagicExt}" /></StackPanel>
+              <StackPanel><TextBlock Text="Item Ext" /><TextBox Text="{Binding ItemExt}" /></StackPanel>
+              <StackPanel><TextBlock Text="Gorgon Eyes" /><TextBox Text="{Binding GorgonEyes}" /></StackPanel>
+              <StackPanel><TextBlock Text="Phoenix Feathers" /><TextBox Text="{Binding PhoenixFeathers}" /></StackPanel>
+              <StackPanel><TextBlock Text="Cyclops Eyes" /><TextBox Text="{Binding CyclopsEyes}" /></StackPanel>
+            </UniformGrid>
+
+            <StackPanel Orientation="Horizontal" Spacing="16">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Infinite" FontWeight="Bold" />
+                <CheckBox Content="Health" IsChecked="{Binding InfiniteHealth}" />
+                <CheckBox Content="Magic" IsChecked="{Binding InfiniteMagic}" />
+                <CheckBox Content="Rage" IsChecked="{Binding InfiniteRage}" />
+              </StackPanel>
+              <StackPanel Spacing="4">
+                <TextBlock Text="Difficulty" FontWeight="Bold" />
+                <RadioButton Content="Easy" IsChecked="{Binding Difficulty, Converter={StaticResource IntToRadio}, ConverterParameter=0}" />
+                <RadioButton Content="Normal" IsChecked="{Binding Difficulty, Converter={StaticResource IntToRadio}, ConverterParameter=1}" />
+                <RadioButton Content="Hard" IsChecked="{Binding Difficulty, Converter={StaticResource IntToRadio}, ConverterParameter=2}" />
+                <RadioButton Content="Very Hard" IsChecked="{Binding Difficulty, Converter={StaticResource IntToRadio}, ConverterParameter=3}" />
+              </StackPanel>
+              <StackPanel Spacing="4">
+                <TextBlock Text="Costume" FontWeight="Bold" />
+                <RadioButton Content="Kratos" IsChecked="{Binding Costume, Converter={StaticResource IntToRadio}, ConverterParameter=0}" />
+                <RadioButton Content="Kratos (God Armor)" IsChecked="{Binding Costume, Converter={StaticResource IntToRadio}, ConverterParameter=1}" />
+                <RadioButton Content="Kratos (Injured)" IsChecked="{Binding Costume, Converter={StaticResource IntToRadio}, ConverterParameter=2}" />
+                <RadioButton Content="Cod of War" IsChecked="{Binding Costume, Converter={StaticResource IntToRadio}, ConverterParameter=10}" />
+                <RadioButton Content="Hydra Armor" IsChecked="{Binding Costume, Converter={StaticResource IntToRadio}, ConverterParameter=11}" />
+                <RadioButton Content="Dark Odyssey" IsChecked="{Binding Costume, Converter={StaticResource IntToRadio}, ConverterParameter=12}" />
+                <RadioButton Content="Athena" IsChecked="{Binding Costume, Converter={StaticResource IntToRadio}, ConverterParameter=13}" />
+                <RadioButton Content="Hercules" IsChecked="{Binding Costume, Converter={StaticResource IntToRadio}, ConverterParameter=14}" />
+                <RadioButton Content="General Kratos" IsChecked="{Binding Costume, Converter={StaticResource IntToRadio}, ConverterParameter=15}" />
+                <RadioButton Content="God of War" IsChecked="{Binding Costume, Converter={StaticResource IntToRadio}, ConverterParameter=16}" />
+              </StackPanel>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="Seconds Played:" VerticalAlignment="Center" />
+              <TextBox Text="{Binding SecondsPlayed}" Width="80" />
+              <TextBlock Text="Cinematics Seen:" VerticalAlignment="Center" />
+              <TextBox Text="{Binding MoviesSeen}" Width="50" IsEnabled="False" />
+              <Button Content="Make All Skippable" Command="{Binding MakeMoviesSkippableCommand}" />
+              <CheckBox Content="Bonus Play" IsChecked="{Binding Bonus}" VerticalAlignment="Center" />
+              <Button Content="Start New Game" Command="{Binding RestartCommand}" />
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- Equipment -->
+      <TabItem IsVisible="{Binding IsMaster, Converter={StaticResource InverseBool}}">
+        <TabItem.Header><TextBlock Text="Equipment" /></TabItem.Header>
+        <ScrollViewer>
+          <StackPanel Margin="8" Spacing="12">
+            <!-- Weapons -->
+            <Border BorderBrush="Gray" BorderThickness="1" Padding="8">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Weapons" FontWeight="Bold" />
+                <UniformGrid Columns="4" RowSpacing="4" ColumnSpacing="4">
+                  <TextBlock Text=" " /><TextBlock Text="Level" /><TextBlock Text="Unlocked" /><TextBlock Text="Selected" />
+                  <TextBlock Text="Blade of Olympus" /><TextBox Text="{Binding BoOlvl}" /><CheckBox IsChecked="{Binding BoOUnl}" /><RadioButton IsChecked="{Binding SelectedWeapon, Converter={StaticResource IntToRadio}, ConverterParameter=17}" />
+                  <TextBlock Text="Spear of Destiny" /><TextBox Text="{Binding SoDlvl}" /><CheckBox IsChecked="{Binding SoDUnl}" /><RadioButton IsChecked="{Binding SelectedWeapon, Converter={StaticResource IntToRadio}, ConverterParameter=14}" />
+                  <TextBlock Text="Barbarian's Hammer" /><TextBox Text="{Binding Bhlvl}" /><CheckBox IsChecked="{Binding BhUnl}" /><RadioButton IsChecked="{Binding SelectedWeapon, Converter={StaticResource IntToRadio}, ConverterParameter=15}" />
+                  <TextBlock Text="Blades of Athena" /><TextBox Text="{Binding BoAlvl}" /><TextBlock Text="(6 = God Blades)" /><TextBlock Text=" " />
+                </UniformGrid>
+              </StackPanel>
+            </Border>
+
+            <!-- Spells -->
+            <Border BorderBrush="Gray" BorderThickness="1" Padding="8">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Spells" FontWeight="Bold" />
+                <UniformGrid Columns="4" RowSpacing="4" ColumnSpacing="4">
+                  <TextBlock Text=" " /><TextBlock Text="Level" /><TextBlock Text="Acquired" /><TextBlock Text="Selected" />
+                  <TextBlock Text="Poseidon's Rage" /><TextBox Text="{Binding Prlvl}" /><CheckBox IsChecked="{Binding PrAcq}" /><RadioButton IsChecked="{Binding SelectedWeapon, Converter={StaticResource IntToRadio}, ConverterParameter=1}" />
+                  <TextBlock Text="Cronos' Rage" /><TextBox Text="{Binding Crlvl}" /><CheckBox IsChecked="{Binding CrAcq}" /><RadioButton IsChecked="{Binding SelectedWeapon, Converter={StaticResource IntToRadio}, ConverterParameter=2}" />
+                  <TextBlock Text="Typhon's Bane" /><TextBox Text="{Binding Tblvl}" /><CheckBox IsChecked="{Binding TbAcq}" /><RadioButton IsChecked="{Binding SelectedWeapon, Converter={StaticResource IntToRadio}, ConverterParameter=3}" />
+                  <TextBlock Text="Atlas Quake" /><TextBox Text="{Binding Aqlvl}" /><CheckBox IsChecked="{Binding AqAcq}" /><RadioButton IsChecked="{Binding SelectedWeapon, Converter={StaticResource IntToRadio}, ConverterParameter=6}" />
+                  <TextBlock Text="Head of Euryale" /><TextBox Text="{Binding Ehlvl}" /><CheckBox IsChecked="{Binding EhAcq}" /><RadioButton IsChecked="{Binding SelectedWeapon, Converter={StaticResource IntToRadio}, ConverterParameter=16}" />
+                </UniformGrid>
+              </StackPanel>
+            </Border>
+
+            <!-- Items -->
+            <Border BorderBrush="Gray" BorderThickness="1" Padding="8">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Items" FontWeight="Bold" />
+                <UniformGrid Columns="2" RowSpacing="4" ColumnSpacing="4">
+                  <CheckBox Content="Rage of the Titans" IsChecked="{Binding RageAcq}" />
+                  <CheckBox Content="Amulet of the Fates" IsChecked="{Binding AmuletAcq}" />
+                  <CheckBox Content="Golden Fleece" IsChecked="{Binding FleeceAcq}" />
+                  <CheckBox Content="Icarus Wings" IsChecked="{Binding WingsAcq}" />
+                </UniformGrid>
+              </StackPanel>
+            </Border>
+
+            <!-- Urns -->
+            <Border BorderBrush="Gray" BorderThickness="1" Padding="8">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Urns" FontWeight="Bold" />
+                <UniformGrid Columns="3" RowSpacing="4" ColumnSpacing="4">
+                  <TextBlock Text=" " /><TextBlock Text="Acquired" /><TextBlock Text="Active" />
+                  <TextBlock Text="Urn of Gaia" /><CheckBox IsChecked="{Binding UrnGaiaAcq}" /><CheckBox IsChecked="{Binding UrnGaiaActive}" />
+                  <TextBlock Text="Urn of the Gorgons" /><CheckBox IsChecked="{Binding UrnGorgonAcq}" /><CheckBox IsChecked="{Binding UrnGorgonsActive}" />
+                  <TextBlock Text="Urn of Olympus" /><CheckBox IsChecked="{Binding UrnOlympusAcq}" /><CheckBox IsChecked="{Binding UrnOlympusActive}" />
+                  <TextBlock Text="Urn of Poseidon" /><CheckBox IsChecked="{Binding UrnPoseidonAcq}" /><CheckBox IsChecked="{Binding UrnPoseidonActive}" />
+                  <TextBlock Text="Urn of Prometheus" /><CheckBox IsChecked="{Binding UrnPrometheusAcq}" /><CheckBox IsChecked="{Binding UrnPrometheusActive}" />
+                  <TextBlock Text="Urn of the Fates" /><CheckBox IsChecked="{Binding UrnFatesAcq}" /><CheckBox IsChecked="{Binding UrnFatesActive}" />
+                </UniformGrid>
+              </StackPanel>
+            </Border>
+
+            <!-- Unknown -->
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="Unknown Unlocks:" VerticalAlignment="Center" />
+              <CheckBox Content="01" IsChecked="{Binding UnkUnl1_02}" />
+              <CheckBox Content="02" IsChecked="{Binding UnkUnl2_01}" />
+              <CheckBox Content="08" IsChecked="{Binding UnkUnl2_08}" />
+              <CheckBox Content="10" IsChecked="{Binding UnkUnl2_10}" />
+              <CheckBox Content="08" IsChecked="{Binding UnkUnl3_08}" />
+              <CheckBox Content="80" IsChecked="{Binding UnkUnl3_80}" />
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- Misc -->
+      <TabItem IsVisible="{Binding IsMaster, Converter={StaticResource InverseBool}}">
+        <TabItem.Header><TextBlock Text="Misc" /></TabItem.Header>
+        <ScrollViewer>
+          <StackPanel Margin="8" Spacing="12">
+            <TextBlock Foreground="Red" TextWrapping="Wrap"
+                       Text="WARNING: Changing anything in this section without a full understanding will likely corrupt your save." />
+            <UniformGrid Columns="3" RowSpacing="8" ColumnSpacing="8">
+              <StackPanel><TextBlock Text="X Pos" /><TextBox Text="{Binding XPos}" /></StackPanel>
+              <StackPanel><TextBlock Text="Y Pos" /><TextBox Text="{Binding YPos}" /></StackPanel>
+              <StackPanel><TextBlock Text="Height" /><TextBox Text="{Binding Height}" /></StackPanel>
+            </UniformGrid>
+            <UniformGrid Columns="2" RowSpacing="8" ColumnSpacing="8">
+              <StackPanel>
+                <TextBlock Text="Active WAD #1" />
+                <TextBox Text="{Binding Wad1}" />
+                <CheckBox Content="Active" IsChecked="{Binding Wad1Active}" Margin="0,4,0,0" />
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="Active WAD #2" />
+                <TextBox Text="{Binding Wad2}" />
+                <CheckBox Content="Active" IsChecked="{Binding Wad2Active}" Margin="0,4,0,0" />
+              </StackPanel>
+              <StackPanel><TextBlock Text="Current Camera" /><TextBox Text="{Binding Camera}" /></StackPanel>
+              <StackPanel><TextBlock Text="WAD section w/CAM" /><TextBox Text="{Binding CamWad}" /></StackPanel>
+            </UniformGrid>
+            <CheckBox Content="Swimming" IsChecked="{Binding Swimming}" />
+            <CheckBox Content="Force Subweapon Usage" IsChecked="{Binding ForcedSubweapon}" />
+            <CheckBox Content="Frozen for Cutscene" IsChecked="{Binding Frozen}" />
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- Stats -->
+      <TabItem IsVisible="{Binding IsMaster, Converter={StaticResource InverseBool}}">
+        <TabItem.Header><TextBlock Text="Stats" /></TabItem.Header>
+        <StackPanel Margin="8" Spacing="10">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Times Saved" VerticalAlignment="Center" />
+            <TextBox Text="{Binding TimesSaved}" Width="40" />
+          </StackPanel>
+        </StackPanel>
+      </TabItem>
+
+    </TabControl>
+  </DockPanel>
+</Window>

@@ -1,0 +1,206 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GodOfWarCSharpSE.ViewModels"
+        x:Class="GodOfWarCSharpSE.Views.GoW3View"
+        x:DataType="vm:GoW3ViewModel"
+        Title="CSharp GoW3 Save Editor"
+        Width="640" Height="700"
+        WindowStartupLocation="CenterScreen">
+
+  <DockPanel Margin="8">
+
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="0,0,0,8">
+      <TextBlock Text="Folder:" VerticalAlignment="Center" />
+      <TextBox Text="{Binding Folder}" Width="380" />
+      <Button Content="Browse" Command="{Binding BrowseCommand}" />
+      <Button Content="Open" Command="{Binding OpenCommand}" />
+      <Button Content="Save" Command="{Binding SaveCommand}" />
+    </StackPanel>
+
+    <TabControl IsVisible="{Binding IsLoaded}">
+
+      <!-- UserData Tab -->
+      <TabItem IsVisible="{Binding IsUserData}">
+        <TabItem.Header><TextBlock Text="UserData" /></TabItem.Header>
+        <ScrollViewer>
+          <StackPanel Margin="8" Spacing="12">
+
+            <StackPanel Orientation="Horizontal" Spacing="24">
+              <Border BorderBrush="Gray" BorderThickness="1" Padding="8">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Difficulties Beaten" FontWeight="Bold" />
+                  <CheckBox Content="Easy" IsChecked="{Binding BeatEasy}" />
+                  <CheckBox Content="Normal" IsChecked="{Binding BeatNormal}" />
+                  <CheckBox Content="Hard" IsChecked="{Binding BeatHard}" />
+                  <CheckBox Content="Very Hard" IsChecked="{Binding BeatVeryHard}" />
+                </StackPanel>
+              </Border>
+
+              <Border BorderBrush="Gray" BorderThickness="1" Padding="8">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Challenges Beaten" FontWeight="Bold" />
+                  <CheckBox Content="Challenge 1" IsChecked="{Binding Ch1}" />
+                  <CheckBox Content="Challenge 2" IsChecked="{Binding Ch2}" />
+                  <CheckBox Content="Challenge 3" IsChecked="{Binding Ch3}" />
+                  <CheckBox Content="Challenge 4" IsChecked="{Binding Ch4}" />
+                  <CheckBox Content="Challenge 5" IsChecked="{Binding Ch5}" />
+                  <CheckBox Content="Challenge 6" IsChecked="{Binding Ch6}" />
+                  <CheckBox Content="Challenge 7" IsChecked="{Binding Ch7}" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="24">
+              <Border BorderBrush="Gray" BorderThickness="1" Padding="8">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Options" FontWeight="Bold" />
+                  <UniformGrid Columns="2" RowSpacing="4" ColumnSpacing="8">
+                    <TextBlock Text="Music Vol" /><TextBox Text="{Binding MusVol}" Width="35" />
+                    <TextBlock Text="Speech Vol" /><TextBox Text="{Binding SpeechVol}" Width="35" />
+                    <TextBlock Text="SFX Vol" /><TextBox Text="{Binding SfxVol}" Width="35" />
+                    <TextBlock Text="Cinematic Vol" /><TextBox Text="{Binding CineVol}" Width="35" />
+                    <TextBlock Text="Sound Mode" /><TextBox Text="{Binding SoundMode}" Width="35" />
+                    <TextBlock Text="Brightness" /><TextBox Text="{Binding Brightness}" Width="35" />
+                    <TextBlock Text="Screen Scale" /><TextBox Text="{Binding ScreenScale}" Width="35" />
+                    <TextBlock Text="Screen Loc X" /><TextBox Text="{Binding ScreenLocX}" Width="35" />
+                    <TextBlock Text="Screen Loc Y" /><TextBox Text="{Binding ScreenLocY}" Width="35" />
+                    <TextBlock Text="Tutorial Display" /><TextBox Text="{Binding TutDisplay}" Width="35" />
+                  </UniformGrid>
+                  <CheckBox Content="Show Subs" IsChecked="{Binding ShowSubs}" />
+                  <CheckBox Content="Invert Flight" IsChecked="{Binding InvertFlight}" />
+                  <CheckBox Content="Invert FreeCam" IsChecked="{Binding InvertFreeCam}" />
+                </StackPanel>
+              </Border>
+
+              <Border BorderBrush="Gray" BorderThickness="1" Padding="8">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="Default Costume" FontWeight="Bold" />
+                  <RadioButton Content="Kratos" IsChecked="{Binding DefaultCostume, Converter={StaticResource IntToRadio}, ConverterParameter=0}" />
+                  <RadioButton Content="Fear Kratos" IsChecked="{Binding DefaultCostume, Converter={StaticResource IntToRadio}, ConverterParameter=1}" />
+                  <RadioButton Content="Apollo" IsChecked="{Binding DefaultCostume, Converter={StaticResource IntToRadio}, ConverterParameter=2}" />
+                  <RadioButton Content="Morpheus" IsChecked="{Binding DefaultCostume, Converter={StaticResource IntToRadio}, ConverterParameter=3}" />
+                  <RadioButton Content="Phantom of Chaos" IsChecked="{Binding DefaultCostume, Converter={StaticResource IntToRadio}, ConverterParameter=4}" />
+                  <RadioButton Content="Forgotten Warrior" IsChecked="{Binding DefaultCostume, Converter={StaticResource IntToRadio}, ConverterParameter=5}" />
+                  <RadioButton Content="Dominus" IsChecked="{Binding DefaultCostume, Converter={StaticResource IntToRadio}, ConverterParameter=6}" />
+                  <RadioButton Content="Deimos (DLC)" IsChecked="{Binding DefaultCostume, Converter={StaticResource IntToRadio}, ConverterParameter=7}" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- SaveData Tab -->
+      <TabItem IsVisible="{Binding IsUserData, Converter={StaticResource InverseBool}}">
+        <TabItem.Header><TextBlock Text="SaveData" /></TabItem.Header>
+        <ScrollViewer>
+          <StackPanel Margin="8" Spacing="12">
+
+            <UniformGrid Columns="2" RowSpacing="8" ColumnSpacing="16">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Save Area" FontWeight="Bold" />
+                <TextBox Text="{Binding SaveArea}" AcceptsReturn="True" Height="50" />
+              </StackPanel>
+              <StackPanel Spacing="4">
+                <TextBlock Text="Save Description" FontWeight="Bold" />
+                <TextBox Text="{Binding SaveDesc}" AcceptsReturn="True" Height="50" />
+              </StackPanel>
+            </UniformGrid>
+
+            <StackPanel Orientation="Horizontal" Spacing="24">
+              <!-- Costume & Difficulty -->
+              <StackPanel Spacing="4">
+                <TextBlock Text="Costume" FontWeight="Bold" />
+                <RadioButton Content="Kratos" IsChecked="{Binding CurrCost, Converter={StaticResource IntToRadio}, ConverterParameter=0}" />
+                <RadioButton Content="Fear Kratos" IsChecked="{Binding CurrCost, Converter={StaticResource IntToRadio}, ConverterParameter=1}" />
+                <RadioButton Content="Apollo" IsChecked="{Binding CurrCost, Converter={StaticResource IntToRadio}, ConverterParameter=2}" />
+                <RadioButton Content="Morpheus" IsChecked="{Binding CurrCost, Converter={StaticResource IntToRadio}, ConverterParameter=3}" />
+                <RadioButton Content="Phantom of Chaos" IsChecked="{Binding CurrCost, Converter={StaticResource IntToRadio}, ConverterParameter=4}" />
+                <RadioButton Content="Forgotten Warrior" IsChecked="{Binding CurrCost, Converter={StaticResource IntToRadio}, ConverterParameter=5}" />
+                <RadioButton Content="Dominus" IsChecked="{Binding CurrCost, Converter={StaticResource IntToRadio}, ConverterParameter=6}" />
+                <RadioButton Content="Deimos (DLC)" IsChecked="{Binding CurrCost, Converter={StaticResource IntToRadio}, ConverterParameter=7}" />
+              </StackPanel>
+
+              <StackPanel Spacing="4">
+                <TextBlock Text="Difficulty" FontWeight="Bold" />
+                <RadioButton Content="Easy" IsChecked="{Binding CurrDiff, Converter={StaticResource IntToRadio}, ConverterParameter=0}" />
+                <RadioButton Content="Normal" IsChecked="{Binding CurrDiff, Converter={StaticResource IntToRadio}, ConverterParameter=1}" />
+                <RadioButton Content="Hard" IsChecked="{Binding CurrDiff, Converter={StaticResource IntToRadio}, ConverterParameter=2}" />
+                <RadioButton Content="Very Hard" IsChecked="{Binding CurrDiff, Converter={StaticResource IntToRadio}, ConverterParameter=3}" />
+              </StackPanel>
+            </StackPanel>
+
+            <!-- Kratos Stats -->
+            <Border BorderBrush="Gray" BorderThickness="1" Padding="8">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Kratos" FontWeight="Bold" />
+                <UniformGrid Columns="4" RowSpacing="4" ColumnSpacing="8">
+                  <TextBlock Text=" " /><TextBlock Text="Current" /><TextBlock Text="Extensions" /><TextBlock Text="Infinite" />
+                  <TextBlock Text="Health" /><TextBox Text="{Binding CurrHealth}" /><TextBox Text="{Binding HealthExt}" /><CheckBox IsChecked="{Binding HealthInfinite}" />
+                  <TextBlock Text="Magic" /><TextBox Text="{Binding CurrMagic}" /><TextBox Text="{Binding MagicExt}" /><CheckBox IsChecked="{Binding MagicInfinite}" />
+                  <TextBlock Text="Item" /><TextBox Text="{Binding CurrItem}" /><TextBox Text="{Binding ItemExt}" /><CheckBox IsChecked="{Binding ItemInfinite}" />
+                  <TextBlock Text="Red Orbs" /><TextBox Text="{Binding RedOrbs}" /><TextBlock Text=" " /><TextBlock Text=" " />
+                </UniformGrid>
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                  <StackPanel><TextBlock Text="X Pos" /><TextBox Text="{Binding XPos}" Width="80" /></StackPanel>
+                  <StackPanel><TextBlock Text="Y Pos" /><TextBox Text="{Binding YPos}" Width="80" /></StackPanel>
+                  <StackPanel><TextBlock Text="Z Pos" /><TextBox Text="{Binding ZPos}" Width="80" /></StackPanel>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <StackPanel Orientation="Horizontal" Spacing="16">
+              <!-- Weapons -->
+              <Border BorderBrush="Gray" BorderThickness="1" Padding="8">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Weapons" FontWeight="Bold" />
+                  <UniformGrid Columns="3" RowSpacing="4" ColumnSpacing="8">
+                    <TextBlock Text=" " /><TextBlock Text="Level" /><TextBlock Text="Unlocked" />
+                    <TextBlock Text="Bow of Apollo" /><TextBox Text="{Binding BowLevel}" /><CheckBox IsChecked="{Binding BowUnlock}" />
+                    <TextBlock Text="Boots of Hermes" /><TextBox Text="{Binding BootsLevel}" /><CheckBox IsChecked="{Binding BootsUnlock}" />
+                    <TextBlock Text="Head of Helios" /><TextBox Text="{Binding HeadLevel}" /><CheckBox IsChecked="{Binding HeadUnlock}" />
+                    <TextBlock Text="Nemean Cestus" /><TextBox Text="{Binding CestusLevel}" /><CheckBox IsChecked="{Binding CestusUnlock}" />
+                    <TextBlock Text="Nemesis Whip" /><TextBox Text="{Binding WhipLevel}" /><CheckBox IsChecked="{Binding WhipUnlock}" />
+                    <TextBlock Text="Blades of Exile" /><TextBox Text="{Binding BladesLevel}" /><CheckBox IsChecked="{Binding BladesUnlock}" />
+                    <TextBlock Text="Claws of Hades" /><TextBox Text="{Binding ClawsLevel}" /><CheckBox IsChecked="{Binding ClawsUnlock}" />
+                  </UniformGrid>
+                </StackPanel>
+              </Border>
+
+              <!-- Possessions -->
+              <Border BorderBrush="Gray" BorderThickness="1" Padding="8">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Possessions" FontWeight="Bold" />
+                  <CheckBox Content="Zeus' Eagle" IsChecked="{Binding ZeusEagle}" />
+                  <CheckBox Content="Hades' Helm" IsChecked="{Binding HadesHelm}" />
+                  <CheckBox Content="Helios' Shield" IsChecked="{Binding HeliosShield}" />
+                  <CheckBox Content="Hermes' Coin" IsChecked="{Binding HermesCoin}" />
+                  <CheckBox Content="Hercules' Shoulder Guard" IsChecked="{Binding HerculesShouldGuard}" />
+                  <CheckBox Content="Poseidon's Conch Shell" IsChecked="{Binding PoseidonsConchShell}" />
+                  <CheckBox Content="Aphrodite's Garter" IsChecked="{Binding AphroditesGarter}" />
+                  <CheckBox Content="Hephaestus' Ring" IsChecked="{Binding HephaestusRing}" />
+                  <CheckBox Content="Daedalus' Schematics" IsChecked="{Binding DaedalusSchematics}" />
+                  <CheckBox Content="Hera's Chalice" IsChecked="{Binding HerasChalice}" />
+                </StackPanel>
+              </Border>
+
+              <!-- Equipment -->
+              <Border BorderBrush="Gray" BorderThickness="1" Padding="8">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Equipment" FontWeight="Bold" />
+                  <CheckBox Content="Poseidon's Trident" IsChecked="{Binding PoseidonsTrident}" />
+                  <CheckBox Content="Blade of Olympus" IsChecked="{Binding BladeOfOlympus}" />
+                  <CheckBox Content="Blade of Olympus (Permarage)" IsChecked="{Binding BladeOfOlympusRage}" />
+                  <CheckBox Content="Boreas Icestorm" IsChecked="{Binding BoreasIcestorm}" />
+                  <CheckBox Content="Golden Fleece" IsChecked="{Binding GoldenFleece}" />
+                  <CheckBox Content="Icarus Wings" IsChecked="{Binding IcarusWings}" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+    </TabControl>
+  </DockPanel>
+</Window>
